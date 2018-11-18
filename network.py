@@ -154,35 +154,36 @@ class Router:
     ## Print routing table
     def print_routes(self):
         
-        dest_list = list(self.rt_tbl_D)
+        # dest_list = list(self.rt_tbl_D)
+        # 
+        # for dest in range(len(dest_list) + 1):
+        #     print('=======', end = '')
+        # 
+        # print()
+        # print('|| ' + self.name + ' ||', end = '')
+        # 
+        # for dest in dest_list:
+        #     print('  ' + dest + '  ', end = '|')
+        # 
+        # router_list = list(self.rt_tbl_D[dest_list[0]])
+        # 
+        # print()
+        # for dest in range(len(dest_list) + 1):
+        #     print('=======', end = '')
+        # 
+        # print()
+        # for router in router_list:
+        #     print('|  ' + router + '  ', end = '|')
+        # 
+        #     for dest in self.rt_tbl_D:
+        #         print('   ' + str(self.rt_tbl_D[dest][router]) + '  ', end = '|')
+        #     print()
+        # 
+        #     for dest in range(len(dest_list) + 1):
+        #         print('-------', end = '')
+        #     print()
         
-        for dest in range(len(dest_list) + 1):
-            print('=======', end = '')
-        
-        print()
-        print('|| ' + self.name + ' ||', end = '')
-        
-        for dest in dest_list:
-            print('  ' + dest + '  ', end = '|')
-        
-        router_list = list(self.rt_tbl_D[dest_list[0]])
-        
-        print()
-        for dest in range(len(dest_list) + 1):
-            print('=======', end = '')
-        
-        print()
-        for router in router_list:
-            print('|  ' + router + '  ', end = '|')
-            
-            for dest in self.rt_tbl_D:
-                print('   ' + str(self.rt_tbl_D[dest][router]) + '  ', end = '|')
-            print()
-            
-            for dest in range(len(dest_list) + 1):
-                print('-------', end = '')
-            print()
-
+        pass
     ## called when printing the object
     def __str__(self):
         return self.name
@@ -243,6 +244,34 @@ class Router:
         # possibly send out routing updates
         print('%s: Received routing update %s from interface %d' % (self, p, i))
         route_table = ast.literal_eval(p.data_S)
+        
+        for dest in route_table:
+            print('*****************************')
+            print(dest)
+            for router in route_table[dest]:
+                print('&&&&&&&&&&&&&&&&&&&')
+                print(list(self.rt_tbl_D))
+                if dest not in list(self.rt_tbl_D):
+                    if router in list(self.rt_tbl_D):
+                        cost_sum = route_table[dest][router] + self.rt_tbl_D[router][self.name]
+                        self.rt_tbl_D.update({dest : {self.name : cost_sum}})
+                    else:
+                        self.rt_tbl_D.update({dest : {self.name : '~~'}})
+                else:
+                    # print('*****************************')
+                    # print(dest)
+                    print(route_table[dest])
+                    self.rt_tbl_D[dest].update(route_table[dest])
+        
+        update = NetworkPacket(0, 'control', str(self.rt_tbl_D))
+        
+        try:
+            print(self.name + ' sending updated routing table to somewhere else')
+            self.intf_L[0].put(update.to_byte_S(), 'out', True)
+        except queue.Full:
+            print('Sorry... Queue was full')
+            pass
+             
 
     ## thread target for the host to keep forwarding data
     def run(self):
