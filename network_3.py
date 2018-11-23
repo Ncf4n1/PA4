@@ -227,11 +227,10 @@ class Router:
                         check_val = value[interface] + self.rt_tbl_D[p.dst][router]
                         outgoing_interface = interface
 
-            if found:
-                self.intf_L[outgoing_interface].put(p.to_byte_S(), 'out', True)
-                print('%s: forwarding packet "%s" from interface %d to %d' % \
-                    (self, p, i, 1))
-                print()
+            self.intf_L[outgoing_interface].put(p.to_byte_S(), 'out', True)
+            print('%s: forwarding packet "%s" from interface %d to %d' % \
+                (self, p, i, 1))
+            print()
         except queue.Full:
             print('%s: packet "%s" lost on interface %d' % (self, p, i))
             pass
