@@ -221,15 +221,22 @@ class Router:
                 for interface, cost in value.items():
                     if (router[0]=='H'):
                         if(router == p.dst):
+                            print()
+                            print('***Found destination host: ' + router)
+                            print()
                             outgoing_interface = interface
                             found = True
                     elif not found and (cost + self.rt_tbl_D[p.dst][router]) < check_val:
+                        print()
+                        print('***Found cheap path going towards destination host through ' + router)
+                        print()
                         check_val = value[interface] + self.rt_tbl_D[p.dst][router]
                         outgoing_interface = interface
 
+            
             self.intf_L[outgoing_interface].put(p.to_byte_S(), 'out', True)
             print('%s: forwarding packet "%s" from interface %d to %d' % \
-                (self, p, i, 1))
+                    (self, p, i, 1))
             print()
         except queue.Full:
             print('%s: packet "%s" lost on interface %d' % (self, p, i))
@@ -277,9 +284,17 @@ class Router:
                         update = True
                         self.rt_tbl_D[dest].update(route_table[dest])
                     else:
+                        print('***********************')
+                        print(self.name + ' dest = ' + str(dest))
+                        print(self.name + ' router = ' + str(router))
+                        print(self.name + ' passed route table entry = ' + str(route_table[dest][router]))
+                        print(self.name + ' self router table entry = ' + str(self.rt_tbl_D[dest][router]))
+                        #print('self name router table entry = ' + str(self.rt_tbl_D[dest][self.name]))
                         if route_table[dest][router] < self.rt_tbl_D[dest][router]:
+                            print(self.name + ' ENTERED------------------------------------')
                             self.rt_tbl_D[dest][router] = route_table[dest][router]
                         if route_table[dest][router] + self.rt_tbl_D[dest][self.name] < self.rt_tbl_D[dest][router]:
+                            print(self.name + ' ENTERED______________________________________')
                             self.rt_tbl_D[dest][router] = route_table[dest][router] + self.rt_tbl_D[dest][self.name]
         
         temp = {}

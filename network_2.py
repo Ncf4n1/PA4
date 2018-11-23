@@ -221,17 +221,23 @@ class Router:
                 for interface, cost in value.items():
                     if (router[0]=='H'):
                         if(router == p.dst):
+                            print()
+                            print('***Found destination host: ' + router)
+                            print()
                             outgoing_interface = interface
                             found = True
                     elif not found and (cost + self.rt_tbl_D[p.dst][router]) < check_val:
+                        print()
+                        print('***Found cheaper path going towards destination host through ' + router)
+                        print()
                         check_val = value[interface] + self.rt_tbl_D[p.dst][router]
                         outgoing_interface = interface
 
-            if found:
-                self.intf_L[outgoing_interface].put(p.to_byte_S(), 'out', True)
-                print('%s: forwarding packet "%s" from interface %d to %d' % \
+            
+            self.intf_L[outgoing_interface].put(p.to_byte_S(), 'out', True)
+            print('%s: forwarding packet "%s" from interface %d to %d' % \
                     (self, p, i, 1))
-                print()
+            print()
         except queue.Full:
             print('%s: packet "%s" lost on interface %d' % (self, p, i))
             pass
