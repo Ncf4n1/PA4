@@ -280,22 +280,18 @@ class Router:
                         update = True
                         self.rt_tbl_D.update({dest : {self.name : '~~'}})
                 else:
-                    if (router, route_table[dest][router]) not in self.rt_tbl_D[dest].items():
+                    if router not in list(self.rt_tbl_D[dest].keys()):
                         update = True
                         self.rt_tbl_D[dest].update(route_table[dest])
                     else:
-                        print('***********************')
-                        print(self.name + ' dest = ' + str(dest))
-                        print(self.name + ' router = ' + str(router))
-                        print(self.name + ' passed route table entry = ' + str(route_table[dest][router]))
-                        print(self.name + ' self router table entry = ' + str(self.rt_tbl_D[dest][router]))
-                        #print('self name router table entry = ' + str(self.rt_tbl_D[dest][self.name]))
+                        if router in list(self.rt_tbl_D):
+                            if route_table[dest][router] + self.rt_tbl_D[router][self.name] < self.rt_tbl_D[dest][self.name]:
+                                update = True
+                                self.rt_tbl_D[dest][self.name] = route_table[dest][router] + self.rt_tbl_D[router][self.name]
+                                
                         if route_table[dest][router] < self.rt_tbl_D[dest][router]:
-                            print(self.name + ' ENTERED------------------------------------')
+                            update = True
                             self.rt_tbl_D[dest][router] = route_table[dest][router]
-                        if route_table[dest][router] + self.rt_tbl_D[dest][self.name] < self.rt_tbl_D[dest][router]:
-                            print(self.name + ' ENTERED______________________________________')
-                            self.rt_tbl_D[dest][router] = route_table[dest][router] + self.rt_tbl_D[dest][self.name]
         
         temp = {}
         for x in sorted(self.rt_tbl_D):
